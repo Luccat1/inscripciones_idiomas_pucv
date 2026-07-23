@@ -17,7 +17,7 @@ function leerRespuestas(sheet) {
 
   if (cols.email === -1 || cols.idioma === -1) {
     throw new Error(
-      'No se encontraron las columnas mínimas (CORREO ELECTRÓNICO, IDIOMA). ' +
+      'No se encontraron las columnas mínimas (correo, idioma). ' +
       'Usa el menú "🔍 Detectar columnas" para revisar el mapeo.'
     );
   }
@@ -29,11 +29,21 @@ function leerRespuestas(sheet) {
     const email = normalizarEmail(row[cols.email]);
     if (!email || !email.includes('@')) continue;
 
-    const idioma = normalizarIdioma(cols.idioma !== -1 ? row[cols.idioma] : '');
-    const nivel = normalizarNivel(cols.nivel !== -1 ? row[cols.nivel] : '');
-    const nombre = cols.nombreCompleto !== -1 ? row[cols.nombreCompleto]?.toString().trim() : '';
-    const horariosCelda = cols.horarios !== -1 ? row[cols.horarios] : '';
+    const idioma = normalizarIdioma(row[cols.idioma]);
+
+    const nombres = cols.nombreCompleto !== -1 ? row[cols.nombreCompleto] : '';
+    const apellidos = cols.apellidos !== -1 ? row[cols.apellidos] : '';
+    const nombre = normalizarNombre([nombres, apellidos].filter(Boolean).join(' '));
+
+    const conoceNivelResp = cols.conoceNivel !== -1 ? row[cols.conoceNivel] : '';
+    const nivelDeclaradoResp = cols.nivelDeclarado !== -1 ? row[cols.nivelDeclarado] : '';
+    const nivel = determinarNivel(conoceNivelResp, nivelDeclaradoResp);
+
+    const horariosCelda = primeraCeldaNoVacia(row, cols.horarios);
     const horarios = parsearHorarios(horariosCelda, idioma);
+
+    const modalidadCelda = primeraCeldaNoVacia(row, cols.modalidad);
+    const modalidades = parsearModalidad(modalidadCelda);
 
     if (!idioma || !nivel || horarios.length === 0) continue;
 
@@ -43,7 +53,8 @@ function leerRespuestas(sheet) {
       email: email,
       idioma: idioma,
       nivel: nivel,
-      horarios: horarios
+      horarios: horarios,
+      modalidades: modalidades
     });
   }
 
@@ -51,31 +62,89 @@ function leerRespuestas(sheet) {
 }
 
 /**
- * Detecta el índice de cada columna relevante, primero por el nombre exacto
- * configurado en CONFIG.formCols y, si no aparece, por palabras clave.
+ * Detecta el índice de cada columna relevante. Los campos de índice único
+ * se buscan por nombre exacto y, si no aparece, por palabras clave.
+ *
+ * "horarios" y "modalidad" son especiales: el Form repite la MISMA pregunta
+ * en varias secciones (una por idioma, vía ramas condicionales), así que acá
+ * se devuelven TODOS los índices que calzan exacto con esa pregunta -- en
+ * cada fila solo una de esas columnas viene con datos (las demás quedan
+ * vacías porque la rama no aplicó), y leerRespuestas() toma la primera no
+ * vacía (ver primeraCeldaNoVacia()).
  */
 function mapearColumnas(headers) {
-  const buscar = (nombreConfigurado, keywords) => {
+  const buscarUno = (nombreConfigurado, keywords) => {
     let idx = headers.indexOf(nombreConfigurado.toUpperCase().trim());
     if (idx !== -1) return idx;
     return headers.findIndex(h => keywords.some(k => h.includes(k)));
   };
 
+  const buscarTodos = (nombreConfigurado) => {
+    const nombreExacto = nombreConfigurado.toUpperCase().trim();
+    const indices = [];
+    headers.forEach((h, idx) => {
+      if (h === nombreExacto) indices.push(idx);
+    });
+    return indices;
+  };
+
   return {
-    marcaTemporal: buscar(CONFIG.formCols.marcaTemporal, ['MARCA TEMPORAL', 'TIMESTAMP']),
-    nombreCompleto: buscar(CONFIG.formCols.nombreCompleto, ['NOMBRE']),
-    email: buscar(CONFIG.formCols.email, ['CORREO', 'EMAIL']),
-    idioma: buscar(CONFIG.formCols.idioma, ['IDIOMA']),
-    nivel: buscar(CONFIG.formCols.nivel, ['NIVEL']),
-    horarios: buscar(CONFIG.formCols.horarios, ['DISPONIBILIDAD', 'HORARIO', 'DÍA', 'DIA'])
+    marcaTemporal: buscarUno(CONFIG.formCols.marcaTemporal, ['MARCA TEMPORAL', 'TIMESTAMP']),
+    nombreCompleto: buscarUno(CONFIG.formCols.nombreCompleto, ['NOMBRE']),
+    apellidos: buscarUno(CONFIG.formCols.apellidos, ['APELLIDO']),
+    email: buscarUno(CONFIG.formCols.email, ['DIRECCIÓN DE CORREO', 'CORREO', 'EMAIL']),
+    idioma: buscarUno(CONFIG.formCols.idioma, ['IDIOMA']),
+    conoceNivel: buscarUno(CONFIG.formCols.conoceNivel, ['CONOCES TU NIVEL']),
+    nivelDeclarado: buscarUno(CONFIG.formCols.nivelDeclarado, ['NIVELES HAS ALCANZADO']),
+    horarios: buscarTodos(CONFIG.formCols.horarios),
+    modalidad: buscarTodos(CONFIG.formCols.modalidad)
   };
 }
 
 /**
+ * Dada una lista de índices de columna (posibles bloques condicionales),
+ * devuelve el valor de la primera celda no vacía de esa fila.
+ */
+function primeraCeldaNoVacia(row, indices) {
+  for (let i = 0; i < indices.length; i++) {
+    const idx = indices[i];
+    if (idx !== -1 && row[idx] !== '' && row[idx] !== null && row[idx] !== undefined) {
+      return row[idx];
+    }
+  }
+  return '';
+}
+
+/**
+ * Resuelve el nivel real de la inscripción según la respuesta a "¿Conoces tu
+ * nivel actual en el idioma que quieres aprender?":
+ * - "Sí, con exactitud..." -> usa el nivel declarado (con certificado/curso).
+ * - "Soy principiante absoluto." -> CONFIG.nivelPrincipiante (ej. A1.1).
+ * - "No, pero he tomado clases." -> CONFIG.nivelPorEvaluar (requiere prueba
+ *   de nivel; no se puede asumir un nivel formal sin evaluar).
+ */
+function determinarNivel(conoceNivelResp, nivelDeclaradoResp) {
+  const respuesta = normalizarTexto(conoceNivelResp);
+  if (!respuesta) return '';
+
+  if (respuesta.indexOf('con exactitud') !== -1) {
+    return normalizarNivel(nivelDeclaradoResp);
+  }
+  if (respuesta.indexOf('principiante absoluto') !== -1) {
+    return CONFIG.nivelPrincipiante;
+  }
+  if (respuesta.indexOf('he tomado clases') !== -1) {
+    return CONFIG.nivelPorEvaluar;
+  }
+  return '';
+}
+
+/**
  * Los checkboxes de Google Forms llegan en una celda como texto separado
- * por comas. Se parsea y se hace match contra el catálogo canónico de
- * CONFIG.horariosPorIdioma para ese idioma (o "_default" si no aplica).
- * Devuelve la lista de ids de bloque reconocidos.
+ * por comas. Se parsea y se hace match (case-insensitive, espacios
+ * colapsados) contra el catálogo canónico de CONFIG.horariosPorIdioma para
+ * ese idioma (o "_default" si no aplica). Devuelve la lista de ids de
+ * bloque reconocidos.
  */
 function parsearHorarios(celda, idioma) {
   if (!celda) return [];
@@ -84,7 +153,8 @@ function parsearHorarios(celda, idioma) {
 
   const ids = [];
   opciones.forEach(opcion => {
-    const match = catalogo.find(h => h.label.trim() === opcion);
+    const opcionNorm = normalizarTexto(opcion);
+    const match = catalogo.find(h => normalizarTexto(h.label) === opcionNorm);
     if (match) {
       ids.push(match.id);
     } else {
@@ -93,6 +163,15 @@ function parsearHorarios(celda, idioma) {
   });
 
   return ids;
+}
+
+/**
+ * Modalidad es informativa (no afecta el umbral de apertura): solo se
+ * limpia la lista de checkboxes marcados, sin match contra catálogo.
+ */
+function parsearModalidad(celda) {
+  if (!celda) return [];
+  return celda.toString().split(',').map(s => s.trim()).filter(Boolean);
 }
 
 /**
@@ -115,11 +194,15 @@ function construirBuckets(inscripciones) {
           horarioId: horarioId,
           horarioLabel: obtenerLabelHorario(insc.idioma, horarioId),
           count: 0,
-          emails: new Set()
+          emails: new Set(),
+          modalidades: {} // informativo, no afecta el umbral -- ver parsearModalidad()
         };
       }
       buckets[clave].count++;
       buckets[clave].emails.add(insc.email);
+      insc.modalidades.forEach(m => {
+        buckets[clave].modalidades[m] = (buckets[clave].modalidades[m] || 0) + 1;
+      });
     });
   });
 
@@ -155,6 +238,11 @@ function obtenerLabelHorario(idioma, horarioId) {
 // ============================================================================
 // NORMALIZACIÓN
 // ============================================================================
+
+function normalizarTexto(texto) {
+  if (!texto) return '';
+  return texto.toString().trim().toLowerCase().replace(/\s+/g, ' ');
+}
 
 function normalizarEmail(email) {
   if (!email) return '';

@@ -43,9 +43,29 @@ inscripciones_idiomas_pucv/
 ```javascript
 umbralMinimo: 6,               // mínimo de interesados por (idioma, nivel, horario)
 emailAvisos: ['idiomas@pucv.cl'],
-horariosPorIdioma: { ... },    // catálogo canónico — debe calzar EXACTO con las opciones del Form
-formCols: { ... }              // mapeo de encabezados del formulario
+horariosPorIdioma: { ... },    // catálogo canónico — el match es case-insensitive, pero el texto (horas/días) debe calzar con las opciones del Form
+formCols: { ... },             // mapeo de encabezados del formulario (identificador = cuenta Google, no el correo tipeado a mano)
+nivelPrincipiante: 'A1.1',                       // "Soy principiante absoluto"
+nivelPorEvaluar: 'Por evaluar (prueba de nivel)' // "No, pero he tomado clases" -- sin certificado, requiere evaluación
 ```
+
+### 🎯 Resolución de nivel
+
+El Form solo pide nivel exacto si la persona dice conocerlo con certificado/curso. Para el resto:
+
+| Respuesta a "¿Conoces tu nivel actual...?" | Nivel asignado |
+|---|---|
+| Sí, con exactitud y prueba/curso oficial | El nivel declarado tal cual |
+| Soy principiante absoluto | `CONFIG.nivelPrincipiante` (A1.1) |
+| No, pero he tomado clases | `CONFIG.nivelPorEvaluar` — bucket aparte, no se asume nivel sin evaluar |
+
+### 🎓 Modalidad (presencial / virtual / híbrido)
+
+Es solo informativa: se muestra en el panorama (columna "Modalidades") pero **no** afecta el semáforo ni el umbral de apertura.
+
+### 🔀 Horarios y modalidad por idioma (ramas del Form)
+
+El Form repite las preguntas "¿Cuál horario prefieres?" y "¿Qué modalidad te acomoda más?" en una sección distinta por cada idioma (salto condicional) — llegan como columnas duplicadas en la hoja de respuestas, y solo la sección del idioma elegido queda con datos. `mapearColumnas()` detecta **todas** las columnas con ese texto exacto y toma la primera celda no vacía de cada fila.
 
 ## 📅 Cada semestre nuevo
 

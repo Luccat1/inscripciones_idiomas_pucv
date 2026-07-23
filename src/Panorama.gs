@@ -6,8 +6,11 @@
 
 const HEADERS_PANORAMA = [
   'IDIOMA', 'NIVEL', 'HORARIO', 'INTERESADOS (bloque)',
-  'PERSONAS ÚNICAS (nivel)', 'ESTADO', 'ACTUALIZADO'
+  'PERSONAS ÚNICAS (nivel)', 'MODALIDADES (informativo)', 'ESTADO', 'ACTUALIZADO'
 ];
+
+// Columna 1-based de ESTADO dentro de HEADERS_PANORAMA, usada para colorear el semáforo.
+const COL_ESTADO = HEADERS_PANORAMA.indexOf('ESTADO') + 1;
 
 /**
  * Recalcula el panorama completo a partir de la hoja de respuestas y lo
@@ -69,6 +72,7 @@ function escribirHojaPanorama(ss, filas, personasUnicas) {
       f.horarioLabel,
       f.count,
       unicas,
+      formatearModalidades(f.modalidades),
       estadoParaConteo(f.count),
       ahora
     ];
@@ -76,14 +80,24 @@ function escribirHojaPanorama(ss, filas, personasUnicas) {
 
   sheet.getRange(2, 1, valores.length, HEADERS_PANORAMA.length).setValues(valores);
 
-  // Colorear la columna ESTADO según semáforo
+  // Colorear la columna ESTADO según semáforo (la modalidad es solo informativa)
   for (let i = 0; i < filas.length; i++) {
     const fila = i + 2;
     const color = colorParaConteo(filas[i].count);
-    sheet.getRange(fila, 6).setBackground(color);
+    sheet.getRange(fila, COL_ESTADO).setBackground(color);
   }
 
   sheet.autoResizeColumns(1, HEADERS_PANORAMA.length);
+}
+
+/**
+ * Formatea la distribución de modalidades marcadas (presencial/virtual/
+ * híbrido) como texto informativo. No influye en el semáforo ni el umbral.
+ */
+function formatearModalidades(modalidades) {
+  const entradas = Object.entries(modalidades || {});
+  if (entradas.length === 0) return '—';
+  return entradas.map(([m, c]) => `${m}: ${c}`).join(', ');
 }
 
 function estadoParaConteo(count) {

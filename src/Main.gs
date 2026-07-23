@@ -149,8 +149,14 @@ function detectarColumnas() {
     .map(h => h.toString().toUpperCase().trim());
   const cols = mapearColumnas(headers);
 
-  const lineas = Object.entries(cols).map(([campo, idx]) => {
-    const encontrado = idx !== -1 ? `"${headers[idx]}" (columna ${idx + 1})` : 'NO ENCONTRADA';
+  const lineas = Object.entries(cols).map(([campo, valor]) => {
+    if (Array.isArray(valor)) {
+      const encontrado = valor.length > 0
+        ? valor.map(idx => `columna ${idx + 1}`).join(', ')
+        : 'NO ENCONTRADA (revisar CONFIG.formCols)';
+      return `• ${campo} (bloques por idioma): ${encontrado}`;
+    }
+    const encontrado = valor !== -1 ? `"${headers[valor]}" (columna ${valor + 1})` : 'NO ENCONTRADA';
     return `• ${campo}: ${encontrado}`;
   });
 
@@ -185,6 +191,16 @@ function showHelp() {
 Una misma persona puede marcar varios horarios posibles, así que el conteo
 por bloque puede sobreestimar. La columna "Personas únicas (nivel)" del
 panorama sirve de contraste para la evaluación de balance.
+
+🎯 NIVEL (cuando no hay certificado):
+- "Soy principiante absoluto" → se cuenta en ${CONFIG.nivelPrincipiante}.
+- "No, pero he tomado clases" → se cuenta en "${CONFIG.nivelPorEvaluar}"
+  (requiere prueba de nivel antes de asignar un nivel formal).
+- Con certificado/curso acreditado → se usa el nivel declarado tal cual.
+
+🎓 MODALIDAD (presencial/virtual/híbrido):
+Es solo informativa (columna "Modalidades (informativo)"); no afecta el
+semáforo ni el umbral de apertura.
 
 📧 Soporte: ${CONFIG.emailAvisos[0]}
   `;

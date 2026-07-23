@@ -35,9 +35,12 @@
 
 ### Data Model
 
-- **Inscripción** (una fila válida de respuestas): `{ rowIndex, nombre, email, idioma, nivel, horarios: [horarioId] }`. Se descarta si falta email válido, idioma, nivel u horarios reconocidos.
-- **Bucket** (unidad de agregación, clave `idioma||nivel||horarioId`): `{ idioma, nivel, horarioId, horarioLabel, count, emails: Set }`. `count` puede sobreestimar si una persona marcó varios horarios — por eso existe el conteo paralelo de **personas únicas por (idioma, nivel)**.
-- El catálogo de horarios en `CONFIG.horariosPorIdioma` debe tener el `label` **idéntico carácter a carácter** a las opciones del checkbox del Form — si no calza, `parsearHorarios()` descarta la opción silenciosamente y solo queda registro en `Logger.log()`.
+- **Inscripción** (una fila válida de respuestas): `{ rowIndex, nombre, email, idioma, nivel, horarios: [horarioId], modalidades: [string] }`. Se descarta si falta email válido, idioma, nivel u horarios reconocidos.
+- **Bucket** (unidad de agregación, clave `idioma||nivel||horarioId`): `{ idioma, nivel, horarioId, horarioLabel, count, emails: Set, modalidades: {texto: count} }`. `count` puede sobreestimar si una persona marcó varios horarios — por eso existe el conteo paralelo de **personas únicas por (idioma, nivel)**. `modalidades` es puramente informativo (columna del panorama), no afecta el semáforo.
+- El catálogo de horarios en `CONFIG.horariosPorIdioma` se compara case-insensitive y con espacios colapsados (`normalizarTexto()` en `Core.gs`), pero el **contenido** (horas, días, sufijos como "- Único horario disponible") debe seguir calzando con las opciones reales del Form — si no calza, `parsearHorarios()` descarta la opción silenciosamente y solo queda registro en `Logger.log()`.
+- **Nivel sin certificado**: el Form solo pide el nivel exacto si la persona declara conocerlo con certificado/curso (pregunta "¿Conoces tu nivel actual...?"). `determinarNivel()` en `Core.gs` resuelve el resto: "Soy principiante absoluto" → `CONFIG.nivelPrincipiante` (A1.1); "No, pero he tomado clases" → `CONFIG.nivelPorEvaluar` (bucket aparte, requiere prueba de nivel — **nunca** asumir un nivel formal para este caso).
+- **Ramas condicionales por idioma**: el Form repite "¿Cuál horario prefieres?" / "¿Qué modalidad te acomoda más?" en una sección por idioma (mismo texto de pregunta, columnas duplicadas en la hoja). `mapearColumnas()` devuelve TODOS los índices que calzan ese texto exacto para `horarios`/`modalidad` (arrays, no índice único); `primeraCeldaNoVacia()` toma la que tenga datos en cada fila.
+- **Correo canónico**: `formCols.email` apunta a "Dirección de correo electrónico" (la cuenta Google que envió el Form), no al campo de correo tipeado a mano — evita duplicados por typos.
 
 ### Code Patterns
 
@@ -76,7 +79,9 @@
 ### Gotchas
 
 - Los triggers instalables **no** se copian al duplicar la hoja/formulario — sin reinstalar, `onFormSubmit` simplemente no corre y nada avisa.
-- `horarioLabel` debe calzar EXACTO (espacios, tildes, mayúsculas) con la opción real del checkbox del Form; un desfase silencioso deja fuera ese horario del conteo.
+- El match de horarios es case-insensitive, pero el **contenido** (horas, días) sigue teniendo que calzar con la opción real del Form; un desfase silencioso deja fuera ese horario del conteo. `Francés` no tiene entrada propia en `horariosPorIdioma` (sin datos reales aún) y cae en `_default` — revisar cuando lleguen sus primeras respuestas.
 - `_Estado_Avisos` está oculta (`sheet.hideSheet()`) — no es basura, es el registro de qué buckets ya avisaron para el semestre vigente.
 - `count` por bucket ≠ personas reales interesadas en ese (idioma, nivel): usar la columna "Personas únicas (nivel)" del panorama como contraste.
 - Column/row indices de Sheets API son 1-based; `rowIndex` en las inscripciones ya viene ajustado (`i + 1`).
+- No asumir que "¿Cuál horario prefieres?"/"¿Qué modalidad te acomoda más?" son columnas únicas — son arrays de índices (una por rama de idioma). Si se agrega un campo nuevo con el mismo patrón de branching, usar `buscarTodos()` + `primeraCeldaNoVacia()`, no `buscarUno()`.
+- `CONFIG.nivelPorEvaluar` no es un nivel real del currículo (no está en `CONFIG.niveles`) — es un bucket administrativo para gente pendiente de prueba de nivel; no debe tratarse como si fuera A1.1 ni ningún nivel formal.
