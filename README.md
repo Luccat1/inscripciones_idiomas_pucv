@@ -26,7 +26,8 @@ inscripciones_idiomas_pucv/
 │   ├── Alertas.gs      # Detección de cruces de umbral + envío de correo (sin duplicados)
 │   └── Main.gs         # Menú, instalación de trigger, setup de nuevo semestre
 ├── README.md
-└── AGENTS.md
+├── AGENTS.md
+└── CHANGELOG.md
 ```
 
 ## 🚀 Instalación

@@ -4,7 +4,7 @@
 
 **Google Apps Script** container-bound project. Procesa las respuestas del formulario de matrícula inicial (interés en cursos) y mantiene actualizada la hoja "Panorama de Cursos", reemplazando la revisión manual con tablas dinámicas por un semáforo automático (🟢 Abre / 🟡 Evaluar / ⚪ Sin interés) y un aviso por correo cuando un horario cruza el mínimo de interesados.
 
-**Versión actual**: v1.0
+**Versión actual**: v1.1.0 (ver `CHANGELOG.md`)
 
 ## Institutional Information
 

@@ -1,6 +1,6 @@
 /**
  * =============================================================================
- * IDIOMAS PUCV - Panorama de Inscripciones v1.0
+ * IDIOMAS PUCV - Panorama de Inscripciones v1.1.0
  * =============================================================================
  * Procesa las respuestas del formulario de matrícula inicial y mantiene un
  * panorama siempre actualizado de qué cursos (idioma + nivel + horario)
