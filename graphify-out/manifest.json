@@ -1,0 +1,27 @@
+{
+  ".claude/settings.local.json": {
+    "mtime": 1784787931.4368424,
+    "ast_hash": "f65328d5c95f8a33b458e079bc4a6303",
+    "semantic_hash": "f65328d5c95f8a33b458e079bc4a6303"
+  },
+  "appsscript.json": {
+    "mtime": 1784786230.880226,
+    "ast_hash": "ce1851a7223ff1874974051eb63b149e",
+    "semantic_hash": "ce1851a7223ff1874974051eb63b149e"
+  },
+  "AGENTS.md": {
+    "mtime": 1784787279.958298,
+    "ast_hash": "95b737ca8b88c1d23391bbf9067d0457",
+    "semantic_hash": "95b737ca8b88c1d23391bbf9067d0457"
+  },
+  "CHANGELOG.md": {
+    "mtime": 1784787271.0369804,
+    "ast_hash": "f5eb226d00f7c651d28dfeb4c34ee5ee",
+    "semantic_hash": "f5eb226d00f7c651d28dfeb4c34ee5ee"
+  },
+  "README.md": {
+    "mtime": 1784787285.643704,
+    "ast_hash": "d559e7d6f873d32c29ee124a33260ef2",
+    "semantic_hash": "d559e7d6f873d32c29ee124a33260ef2"
+  }
+}
