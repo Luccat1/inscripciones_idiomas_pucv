@@ -101,3 +101,12 @@ const CONFIG = {
     grisSinInteres: '#f1f1f1'
   }
 };
+
+// ============================================================================
+// EXPORT PARA TESTS (Node) -- bloque inerte bajo el runtime V8 de Apps Script,
+// que no define un global `module`. Ver test/Core.test.js y
+// .planning/phases/01-test-harness-characterization-tests/01-RESEARCH.md.
+// ============================================================================
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { CONFIG };
+}
