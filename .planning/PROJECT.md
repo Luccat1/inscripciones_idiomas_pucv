@@ -20,6 +20,7 @@ Staff can trust the Panorama and its alerts completely — no silently dropped r
 - ✓ Manual test-alert tool to preview email formatting without affecting real state — existing
 - ✓ Sidebar view of the panorama — existing
 - ✓ Column-detection helper to re-map form headers after form edits — existing
+- ✓ Automated unit tests cover the pure data-transformation functions in `Core.gs` (`mapearColumnas`, `parsearHorarios`, `determinarNivel`, `normalizarNombre`, `construirBuckets`) — Validated in Phase 1: Test Harness & Characterization Tests
 
 ### Active
 
@@ -29,7 +30,6 @@ This milestone is **strictly hardening/quality work** — no new user-facing fea
 - [ ] A failure sending one bucket's alert doesn't block evaluation/notification of the other buckets in the same trigger run (per-bucket isolation instead of one function-level try/catch)
 - [ ] Rows with an unmatched/unparseable horario label are surfaced (counted and reported), not silently discarded — a respondent's whole registration currently vanishes from all reporting on a single label mismatch
 - [ ] Concurrent form submissions are serialized (`LockService`) around the recalculate + alert-dispatch critical section, so simultaneous submissions can't interleave writes to the Panorama sheet or `_Estado_Avisos`
-- [ ] Automated unit tests cover the pure data-transformation functions in `Core.gs` (`mapearColumnas`, `parsearHorarios`, `determinarNivel`, `normalizarNombre`, `construirBuckets`) — the exact functions responsible for the real regressions fixed in v1.1.0
 - [ ] Staff-facing error/status messages replace silent `Logger.log()`-only failure paths — e.g. discarded-row counts and unmatched-horario counts surfaced in the "🔄 Recalcular Panorama" completion dialog, not just the execution log
 - [ ] In-sheet guidance (labels, help text, or a help tab) exists so non-technical staff understand what the menu options and Panorama columns mean without reading code
 - [ ] Semester setup documentation is clear enough for a non-coder to follow end-to-end, building on README's existing "Cada semestre nuevo" section
@@ -84,4 +84,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-25 after initialization*
+*Last updated: 2026-07-25 after Phase 1: Test Harness & Characterization Tests complete*
