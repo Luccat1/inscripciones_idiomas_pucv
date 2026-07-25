@@ -275,3 +275,26 @@ function normalizarNombre(texto) {
 
   return normalizado;
 }
+
+// ============================================================================
+// EXPORT PARA TESTS (Node) -- bloque inerte bajo el runtime V8 de Apps Script,
+// que no define un global `module`. Exporta las 5 funciones objetivo de
+// TEST-01 más sus helpers internos, para permitir aserciones directas sin
+// forzar toda cobertura a pasar por 2 niveles de indirección. Ver
+// test/Core.test.js y
+// .planning/phases/01-test-harness-characterization-tests/01-RESEARCH.md.
+// ============================================================================
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    mapearColumnas,
+    parsearHorarios,
+    determinarNivel,
+    normalizarNombre,
+    construirBuckets,
+    normalizarTexto,
+    normalizarNivel,
+    normalizarIdioma,
+    primeraCeldaNoVacia,
+    obtenerLabelHorario
+  };
+}
