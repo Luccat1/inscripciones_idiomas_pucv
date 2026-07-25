@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 1 planned (2 plans, 2 waves)
-last_updated: "2026-07-25T19:56:39.805Z"
-last_activity: 2026-07-25 — Phase 1 planned (2 plans, ready to execute)
+status: executing
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-07-25T20:21:12.625Z"
+last_activity: 2026-07-25
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 2
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-25)
 
 **Core value:** Staff can trust the Panorama and its alerts completely — no silently dropped registrations, no silently failed notifications, and no reliance on someone reading Apps Script execution logs to know something went wrong.
-**Current focus:** Phase 1 - Test Harness & Characterization Tests
+**Current focus:** Phase 01 — Test Harness & Characterization Tests
 
 ## Current Position
 
-Phase: 1 of 5 (Test Harness & Characterization Tests)
-Plan: 0 of 2 in current phase
+Phase: 01 (Test Harness & Characterization Tests) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-07-25 — Phase 1 planned (2 plans, ready to execute)
+Last activity: 2026-07-25
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 01 P01 | 1min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -63,6 +64,8 @@ Recent decisions affecting current work:
 - Milestone scope: hardening-only, no new user-facing features (confirmed with user)
 - Do NOT adopt `clasp` this milestone — use a guarded `module.exports` shim + Vitest/`node:test` instead (research-verified live, zero risk to copy-paste deploy workflow)
 - Phase 2 deliberately keeps the LockService + per-bucket isolation + confirm-then-record fixes as ONE atomic phase — they touch the same ~20 lines in `src/Alertas.gs` per architecture research
+- [Phase 01]: Exported the 5 internal Core.gs helpers alongside the 5 TEST-01 target functions, giving Plan 02 the option of direct helper-level assertions
+- [Phase 01]: Added engines.node >=20 to package.json since node:test is stable only from Node 20 onward
 
 ### Pending Todos
 
@@ -85,6 +88,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-25T19:56:39.805Z
-Stopped at: Phase 1 planned (2 plans, 2 waves)
-Resume file: .planning/phases/01-test-harness-characterization-tests/01-01-PLAN.md
+Last session: 2026-07-25T20:21:12.618Z
+Stopped at: Completed 01-01-PLAN.md
+Resume file: None
