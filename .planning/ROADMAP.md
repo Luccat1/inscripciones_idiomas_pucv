@@ -28,7 +28,9 @@ This milestone hardens an existing, in-production Google Apps Script automation 
   3. `Core.gs` still runs unmodified inside the Apps Script V8 editor: the guarded `module.exports` shim added for testing is confirmed inert in production (no `module` global exists there, so nothing changes about the copy-paste deploy).
   4. A short note (README or inline comment) documents how to run the tests locally, so this suite becomes the standard regression check for any future edit to these five functions.
 **Plans**: 2 plans
+**Wave 1**
 - [ ] 01-01-PLAN.md — Add guarded module.exports shims to src/Config.gs and src/Core.gs + create root package.json
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 01-02-PLAN.md — Write test/Core.test.js characterization suite + README Tests section + end-of-phase Apps Script inertness check
 
 ### Phase 2: Trigger Critical-Section Hardening
