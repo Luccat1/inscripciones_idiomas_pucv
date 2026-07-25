@@ -22,7 +22,7 @@ This is a **hardening-only milestone** on an existing production system. No new 
 
 ### Testing
 
-- [ ] **TEST-01**: Automated unit tests cover the five pure data-transformation functions in `Core.gs` (`mapearColumnas`, `parsearHorarios`, `determinarNivel`, `normalizarNombre`, `construirBuckets`) using a guarded `module.exports` shim (inert under the Apps Script V8 runtime) + Vitest or `node:test` — no `clasp` adoption, no changes to the copy-paste deploy workflow.
+- [x] **TEST-01**: Automated unit tests cover the five pure data-transformation functions in `Core.gs` (`mapearColumnas`, `parsearHorarios`, `determinarNivel`, `normalizarNombre`, `construirBuckets`) using a guarded `module.exports` shim (inert under the Apps Script V8 runtime) + Vitest or `node:test` — no `clasp` adoption, no changes to the copy-paste deploy workflow.
 
 ### Staff Visibility
 
@@ -65,7 +65,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TEST-01 | Phase 1 - Test Harness & Characterization Tests | Pending |
+| TEST-01 | Phase 1 - Test Harness & Characterization Tests | Complete |
 | ALRT-01 | Phase 2 - Trigger Critical-Section Hardening | Pending |
 | ALRT-02 | Phase 2 - Trigger Critical-Section Hardening | Pending |
 | CONC-01 | Phase 2 - Trigger Critical-Section Hardening | Pending |
@@ -75,6 +75,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DOCS-02 | Phase 5 - Staff-Facing Documentation & In-Sheet Guidance | Pending |
 
 **Coverage:**
+
 - v1 requirements: 8 total
 - Mapped to phases: 8/8 ✓
 - Unmapped: 0 ✓

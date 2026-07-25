@@ -11,7 +11,7 @@ This milestone hardens an existing, in-production Google Apps Script automation 
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Test Harness & Characterization Tests** - Automated tests capture the current, real behavior of the five pure `Core.gs` functions before anything is refactored
+- [x] **Phase 1: Test Harness & Characterization Tests** - Automated tests capture the current, real behavior of the five pure `Core.gs` functions before anything is refactored (completed 2026-07-25)
 - [ ] **Phase 2: Trigger Critical-Section Hardening** - Concurrent form submissions are serialized and a bucket is only ever marked notified after its email is confirmed sent
 - [ ] **Phase 3: Menu-Path Lock Guard & Discard Visibility** - The interactive recalculate path is protected from concurrent runs, and unmatched-horario rows are counted and shown instead of silently discarded
 - [ ] **Phase 4: PropertiesService Reliability Bridge** - Alert-send and discard failures from a headless trigger run surface to staff the next time they open the menu
@@ -38,7 +38,7 @@ This milestone hardens an existing, in-production Google Apps Script automation 
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02-PLAN.md — Write test/Core.test.js characterization suite + README Tests section + end-of-phase Apps Script inertness check
+- [x] 01-02-PLAN.md — Write test/Core.test.js characterization suite + README Tests section + end-of-phase Apps Script inertness check
 
 ### Phase 2: Trigger Critical-Section Hardening
 
@@ -104,7 +104,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Test Harness & Characterization Tests | 1/2 | In Progress|  |
+| 1. Test Harness & Characterization Tests | 2/2 | Complete   | 2026-07-25 |
 | 2. Trigger Critical-Section Hardening | 0/TBD | Not started | - |
 | 3. Menu-Path Lock Guard & Discard Visibility | 0/TBD | Not started | - |
 | 4. PropertiesService Reliability Bridge | 0/TBD | Not started | - |
