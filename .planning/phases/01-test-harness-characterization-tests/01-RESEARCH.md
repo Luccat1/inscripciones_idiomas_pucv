@@ -364,17 +364,17 @@ describe('construirBuckets', () => {
 | A1 | The `typeof module !== 'undefined'` guard is a true no-op inside the actual Apps Script V8 editor (no `module` global exists there) | Don't Hand-Roll, Pattern 1 | This is based on documented Apps Script runtime characteristics (`.planning/codebase/STACK.md`, `PROJECT.md` Key Decisions) and general JS engine behavior, not verified by executing code inside an actual Apps Script project during this research session (no such environment was reachable from this session). If wrong, the shim could throw a `ReferenceError` on `module` inside the live editor. Mitigation: the planner should include a manual verification task (paste the shimmed files into a real Apps Script editor and run `onOpen()`/`recalcularPanoramaConAlerta()` once) as part of this phase's acceptance, matching success criterion 3 in the roadmap. |
 | A2 | Node.js version ≥20 (stable `node:test`) is what any given maintainer's machine will have when running `npm test` in the future | Standard Stack, Environment Availability | This repo has no `engines` field, `.nvmrc`, or CI to enforce a minimum. If a future maintainer runs Node 16/18, `node:test`'s auto-discovery behavior may differ or be less complete (experimental-era gaps). Risk is low-to-moderate for a single/small-team institutional tool; mitigation is cheap (add an `engines` field and/or a one-line prerequisite note in the new README "🧪 Tests" section). |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should the guarded shim also export the internal helper functions (`normalizarTexto`, `normalizarNivel`, `normalizarIdioma`, `primeraCeldaNoVacia`, `obtenerLabelHorario`)?**
    - What we know: CONTEXT.md marks this explicitly as Claude's Discretion. All 5 target functions call at least one of these helpers internally, so their behavior is already exercised indirectly.
    - What's unclear: Whether direct unit coverage of, e.g., `normalizarTexto`'s whitespace-collapsing/lowercasing logic is worth the extra export surface, versus keeping the shim's public surface minimal (only the 5 named functions, matching TEST-01's literal scope).
-   - Recommendation: Export them too — the marginal cost is one more line in the shim's export object, and it gives the planner the option to add focused edge-case tests (e.g., `normalizarTexto` collapsing multiple internal spaces) without forcing every case through a 2-hop indirect path. This is a low-risk, low-cost addition; final call remains the planner's/implementer's discretion per CONTEXT.md.
+   - RESOLVED: Export them too — the marginal cost is one more line in the shim's export object, and it gives the planner the option to add focused edge-case tests (e.g., `normalizarTexto` collapsing multiple internal spaces) without forcing every case through a 2-hop indirect path. Plan 01-01 Task 2 implements this.
 
 2. **Should `package.json` declare an explicit `engines.node` minimum?**
    - What we know: `node:test` is stable as of Node 20, experimental in Node 18 (per WebSearch, cross-sourced, MEDIUM confidence — not independently verified against Node's official changelog in this session). This repo currently pins no runtime version anywhere.
    - What's unclear: Whether the project's actual maintainers' machines are guaranteed to be on a modern-enough Node version, since this is the *first* npm-touching file the repo will ever have.
-   - Recommendation: Add `"engines": { "node": ">=20" }` to the `package.json` in Code Examples above, and mention the requirement in the new README "🧪 Tests" section (D-06) so a maintainer on an old Node install gets a clear signal rather than a confusing "no tests ran" silent pass.
+   - RESOLVED: Add `"engines": { "node": ">=20" }` to the `package.json` in Code Examples above, and mention the requirement in the new README "🧪 Tests" section (D-06) so a maintainer on an old Node install gets a clear signal rather than a confusing "no tests ran" silent pass. Plan 01-01 Task 2 implements this.
 
 ## Environment Availability
 
