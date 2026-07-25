@@ -65,20 +65,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TEST-01 | TBD | Pending |
-| ALRT-01 | TBD | Pending |
-| ALRT-02 | TBD | Pending |
-| CONC-01 | TBD | Pending |
-| DATA-01 | TBD | Pending |
-| VISB-01 | TBD | Pending |
-| DOCS-01 | TBD | Pending |
-| DOCS-02 | TBD | Pending |
+| TEST-01 | Phase 1 - Test Harness & Characterization Tests | Pending |
+| ALRT-01 | Phase 2 - Trigger Critical-Section Hardening | Pending |
+| ALRT-02 | Phase 2 - Trigger Critical-Section Hardening | Pending |
+| CONC-01 | Phase 2 - Trigger Critical-Section Hardening | Pending |
+| DATA-01 | Phase 3 - Menu-Path Lock Guard & Discard Visibility | Pending |
+| VISB-01 | Phase 4 - PropertiesService Reliability Bridge | Pending |
+| DOCS-01 | Phase 5 - Staff-Facing Documentation & In-Sheet Guidance | Pending |
+| DOCS-02 | Phase 5 - Staff-Facing Documentation & In-Sheet Guidance | Pending |
 
 **Coverage:**
 - v1 requirements: 8 total
-- Mapped to phases: 0 (pending roadmap creation)
-- Unmapped: 8 ⚠️ (expected — roadmap not yet created)
+- Mapped to phases: 8/8 ✓
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-07-25*
-*Last updated: 2026-07-25 after initial definition*
+*Last updated: 2026-07-25 after roadmap creation (5 phases, full coverage)*
