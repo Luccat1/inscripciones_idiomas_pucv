@@ -85,6 +85,18 @@ Los triggers instalables **no** se copian al duplicar la hoja/formulario. Antes 
 - **🧪 Enviar aviso de prueba**: prueba el formato del correo sin afectar el estado real.
 - **🔍 Detectar columnas del formulario**: ayuda a mapear `CONFIG.formCols`.
 
+## 🧪 Tests
+
+Este proyecto cuenta con tests de caracterización (`test/Core.test.js`) para las 5 funciones puras de `Core.gs` que procesan cada inscripción: `mapearColumnas`, `parsearHorarios`, `determinarNivel`, `normalizarNombre` y `construirBuckets` — las mismas funciones responsables de los bugs reales corregidos en v1.1.0. Sirven como red de regresión estándar para cualquier cambio futuro a esas 5 funciones.
+
+```bash
+npm test
+```
+
+No requiere `npm install` (cero dependencias externas) — solo Node.js `>=20` (ver `engines` en `package.json`), ya que `node:test` es estable desde esa versión.
+
+El bloque `module.exports` agregado al final de `Core.gs` y `Config.gs` es inerte dentro del editor de Google Apps Script (no existe un global `module` ahí), por lo que no afecta el flujo de despliegue por copiar y pegar descrito en "🚀 Instalación".
+
 ## 📞 Contacto
 
 - 📧 idiomas@pucv.cl
