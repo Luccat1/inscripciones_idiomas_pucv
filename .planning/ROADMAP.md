@@ -104,7 +104,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Test Harness & Characterization Tests | 2/2 | Complete   | 2026-07-25 |
+| 1. Test Harness & Characterization Tests | 2/2 | Complete    | 2026-07-25 |
 | 2. Trigger Critical-Section Hardening | 0/TBD | Not started | - |
 | 3. Menu-Path Lock Guard & Discard Visibility | 0/TBD | Not started | - |
 | 4. PropertiesService Reliability Bridge | 0/TBD | Not started | - |
