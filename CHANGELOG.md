@@ -5,6 +5,27 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 El versionado sigue [Semantic Versioning](https://semver.org/lang/es/).
 
+## [2.0.0] - 2026-07-25
+
+### Añadido
+
+- **Harness de tests Node.js** — Se agrega `package.json` raíz sin dependencias en tiempo de ejecución (`npm test` corre `node --test`), habilitando pruebas fuera del entorno Apps Script.
+- **Shim `module.exports` en `Config.gs`** — Bloque de exportación guardado con `typeof module !== 'undefined'` al final del archivo, sin tocar las líneas existentes. Permite `require('./src/Config.gs').CONFIG` desde Node.
+- **Shim `module.exports` en `Core.gs`** — Exporta las 5 funciones objetivo (`mapearColumnas`, `parsearHorarios`, `determinarNivel`, `normalizarNombre`, `construirBuckets`) más sus 5 helpers internos, también guardado para ser no-op bajo Apps Script V8.
+- **Suite de tests de caracterización (`test/Core.test.js`)** — 17 casos organizados en 5 `describe()` que cubren:
+  - `mapearColumnas`: cabecera faltante (retorna `-1` / `[]`), sanity check de cabecera real.
+  - `parsearHorarios`: match case-insensitive, celda vacía, múltiples horarios, catálogo `_default`.
+  - `determinarNivel`: nivel con certificado exacto, principiante absoluto, ha tomado clases, vacío, fallthrough sin match.
+  - `normalizarNombre`: preservación de partículas en minúscula, colapso de espacios, cadena vacía.
+  - `construirBuckets`: conteo/Set de emails/modalidades en bucket compartido, entrada vacía → `{}`.
+- **Sección "Tests" en `README.md`** — Documenta cómo correr la suite con `npm test`.
+
+### Cambiado
+
+- `Config.gs` y `Core.gs` se vuelven **importables desde Node** sin modificar su comportamiento en Apps Script (adición puramente aditiva: no se alteró ninguna línea existente).
+
+---
+
 ## [1.1.0] - 2026-07-23
 
 ### Corregido
