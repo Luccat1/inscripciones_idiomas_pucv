@@ -38,7 +38,7 @@ This milestone is **strictly hardening/quality work** — no new user-facing fea
 
 - New user-facing features or workflow changes — explicitly deferred; this milestone is hardening only
 - Adding a verified `Francés` horario catalog entry — blocked on real form responses to verify correct label text; not something that can be hardened preemptively (per existing code comment, "sin datos reales aún")
-- Migrating the deployment model away from manual copy-paste into the Apps Script editor — out of scope unless required to enable automated testing (see Key Decisions)
+- Migrating the deployment model away from manual copy-paste into the Apps Script editor (e.g. adopting `clasp`) — research confirmed it's not needed for testing (see Key Decisions); revisit only in a future milestone if CI/CD auto-deploy becomes a goal
 - Archiving/pruning historical response rows for scale — current volume (tens to low hundreds of rows/semester) doesn't need it yet; revisit if the "Missing Critical Features" scaling note in CONCERNS.md becomes relevant
 
 ## Context
@@ -62,7 +62,7 @@ This milestone is **strictly hardening/quality work** — no new user-facing fea
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | Milestone scope is hardening-only, no new features | User explicitly chose this over "hardening + new capability" to keep risk and review surface small | — Pending |
-| Automated tests will need `clasp` + local Node test runner (extracting pure functions from `Core.gs`) since Apps Script has no native test framework | Identified in CONCERNS.md as the only viable path to unit-test `mapearColumnas`/`parsearHorarios`/etc. without a live Sheet | — Pending (confirm during roadmap/research) |
+| Do NOT adopt `clasp` this milestone. Use Vitest (or `node:test`) + a guarded `module.exports` block (inert under the Apps Script V8 runtime) at the bottom of `Core.gs`'s pure functions, so `require()` works from Node with zero changes to the copy-paste deploy workflow | Research verified live that a guarded export block is a no-op in Apps Script's runtime (no global `module`) and that the 5 target functions are already pure with no `SpreadsheetApp`/`MailApp` deps — clasp adds migration risk (full-file overwrite, manifest/OAuth drift) for no testing benefit | ✓ Good |
 
 ## Evolution
 
