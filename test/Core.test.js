@@ -31,8 +31,8 @@ global.CONFIG = require('../src/Config.gs').CONFIG;
 global.Logger = { log: () => {} };
 
 // 3. Ahora sí, requerir Core.gs y desestructurar las 5 funciones objetivo de
-//    TEST-01 (el resto de describe() blocks se agregan en el mismo archivo,
-//    per D-05: un solo archivo consolidado).
+//    TEST-01 (los bloques de tests restantes se agregan en este mismo
+//    archivo, per D-05: un solo archivo consolidado).
 const {
   mapearColumnas,
   parsearHorarios,
@@ -103,5 +103,93 @@ describe('parsearHorarios', () => {
   test('celda vacía o null -> [] (guard temprano, nunca null/undefined)', () => {
     assert.deepEqual(parsearHorarios('', 'Alemán'), []);
     assert.deepEqual(parsearHorarios(null, 'Alemán'), []);
+  });
+});
+
+describe('determinarNivel', () => {
+  test('"con exactitud" -> normalizarNivel(nivelDeclarado) matcheado contra CONFIG.niveles', () => {
+    const result = determinarNivel(
+      'Sí, con exactitud y cuento con certificado/curso oficial',
+      'b1.1'
+    );
+    assert.equal(result, 'B1.1');
+  });
+
+  test('"principiante absoluto" -> CONFIG.nivelPrincipiante', () => {
+    const result = determinarNivel('Soy principiante absoluto.', '');
+    assert.equal(result, CONFIG.nivelPrincipiante);
+    assert.equal(result, 'A1.1');
+  });
+
+  test('"he tomado clases" -> CONFIG.nivelPorEvaluar', () => {
+    const result = determinarNivel('No, pero he tomado clases.', '');
+    assert.equal(result, CONFIG.nivelPorEvaluar);
+    assert.equal(result, 'Por evaluar (prueba de nivel)');
+  });
+
+  test('respuesta vacía o undefined -> \'\' (nunca null/undefined)', () => {
+    assert.equal(determinarNivel('', ''), '');
+    assert.equal(determinarNivel(undefined, undefined), '');
+  });
+
+  test('respuesta que no calza con ninguna rama -> \'\' (fallthrough)', () => {
+    const result = determinarNivel('respuesta que no calza con ninguna rama', '');
+    assert.equal(result, '');
+  });
+});
+
+describe('normalizarNombre', () => {
+  test('particulas ("de", "la") se preservan en minúscula cuando no son la primera palabra', () => {
+    const result = normalizarNombre('juan perez de la cruz');
+    assert.equal(result, 'Juan Perez de la Cruz');
+  });
+
+  test('espacios múltiples/extremos se colapsan; partícula "von" se preserva en minúscula', () => {
+    const result = normalizarNombre('  MARÍA   VON TRAPP  ');
+    assert.equal(result, 'María von Trapp');
+  });
+
+  test('cadena vacía -> \'\'', () => {
+    assert.equal(normalizarNombre(''), '');
+  });
+});
+
+describe('construirBuckets', () => {
+  test('dos inscripciones con mismo (idioma, nivel, horario) y distinto email -> count=2, emails Set de 2, modalidades tallado', () => {
+    const inscripciones = [
+      {
+        rowIndex: 2,
+        nombre: 'Persona Uno',
+        email: 'persona1@pucv.cl',
+        idioma: 'Alemán',
+        nivel: 'A1.1',
+        horarios: ['LM_1730'],
+        modalidades: ['Presencial']
+      },
+      {
+        rowIndex: 3,
+        nombre: 'Persona Dos',
+        email: 'persona2@pucv.cl',
+        idioma: 'Alemán',
+        nivel: 'A1.1',
+        horarios: ['LM_1730'],
+        modalidades: ['Virtual']
+      }
+    ];
+
+    const buckets = construirBuckets(inscripciones);
+    const bucket = buckets['Alemán||A1.1||LM_1730'];
+
+    assert.equal(bucket.count, 2);
+    // emails es un Set (src/Core.gs:197), no un arreglo -- NUNCA usar
+    // JSON.stringify() para comparar (un Set serializa a {} y descarta los
+    // datos bajo prueba, ver Pitfall 3 en 01-RESEARCH.md). assert.deepEqual
+    // compara el contenido de un Set directamente, sin importar el orden.
+    assert.deepEqual(bucket.emails, new Set(['persona1@pucv.cl', 'persona2@pucv.cl']));
+    assert.deepEqual(bucket.modalidades, { Presencial: 1, Virtual: 1 });
+  });
+
+  test('lista vacía de inscripciones -> {} (objeto vacío, no null/undefined)', () => {
+    assert.deepEqual(construirBuckets([]), {});
   });
 });
