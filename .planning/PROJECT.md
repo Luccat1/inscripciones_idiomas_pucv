@@ -40,6 +40,8 @@ This milestone is **strictly hardening/quality work** — no new user-facing fea
 - Adding a verified `Francés` horario catalog entry — blocked on real form responses to verify correct label text; not something that can be hardened preemptively (per existing code comment, "sin datos reales aún")
 - Migrating the deployment model away from manual copy-paste into the Apps Script editor (e.g. adopting `clasp`) — research confirmed it's not needed for testing (see Key Decisions); revisit only in a future milestone if CI/CD auto-deploy becomes a goal
 - Archiving/pruning historical response rows for scale — current volume (tens to low hundreds of rows/semester) doesn't need it yet; revisit if the "Missing Critical Features" scaling note in CONCERNS.md becomes relevant
+- Manual "🔁 Reintentar avisos pendientes" retry action for quota-failed alerts — confirm-then-record already stops false "sent" marks (the main trust problem); this residual gap (alert never retried if no further submission arrives) is rare — user deferred to next milestone
+- Ambient health-check sidebar block (persisting last-run counts beyond the one-shot dialog) — user confirmed the one-shot completion dialog is sufficient for this milestone; sidebar persistence is a legitimate next-milestone enhancement
 
 ## Context
 
