@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 Phase: 2
 Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-07-25
+Last activity: 2026-08-06 - Completed quick task 260806-hxc: Actualizar Config.gs para alinear el catálogo con el formulario real del 2do semestre 2026
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -72,6 +72,12 @@ Recent decisions affecting current work:
 ### Pending Todos
 
 None yet.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260806-hxc | Actualizar Config.gs para alinear el catálogo con el formulario real del 2do semestre 2026 | 2026-08-06 | ee223ac | [260806-hxc-actualizar-config-gs-para-alinear-el-cat](.planning/quick/260806-hxc-actualizar-config-gs-para-alinear-el-cat/) |
 
 ### Blockers/Concerns
 
