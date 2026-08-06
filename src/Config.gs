@@ -28,6 +28,16 @@ const CONFIG = {
     'C1.1', 'C1.2'
   ],
 
+  // Secuencia canónica de niveles por idioma, usada por siguienteNivel() en
+  // Core.gs para calcular el nivel de inscripción de quien ya domina el nivel
+  // declarado. Mismo patrón de catálogo por idioma + fallback '_default' que
+  // horariosPorIdioma. Japonés tiene solo A1.1 (único nivel ofrecido este
+  // semestre); para todos los demás idiomas aplica la secuencia completa.
+  nivelesPorIdioma: {
+    'Japonés': ['A1.1'],
+    '_default': ['A1.1', 'A1.2', 'A2.1', 'A2.2', 'B1.1', 'B1.2', 'B1+', 'B2.1', 'B2.2', 'C1.1', 'C1.2']
+  },
+
   // Catálogo canónico de horarios por idioma. Cada bloque tiene un id
   // estable (usado como clave interna) y una etiqueta (la que aparece
   // literalmente como opción del formulario, para hacer match).
