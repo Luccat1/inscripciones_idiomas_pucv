@@ -38,7 +38,9 @@ const {
   parsearHorarios,
   determinarNivel,
   normalizarNombre,
-  construirBuckets
+  construirBuckets,
+  siguienteNivel,
+  encontrarHorarioNoReconocido
 } = require('../src/Core.gs');
 
 describe('mapearColumnas', () => {
@@ -87,7 +89,7 @@ describe('parsearHorarios', () => {
     assert.deepEqual(result, []);
   });
 
-  test('Francés no tiene entrada propia en el catálogo -> cae en _default', () => {
+  test('Francés tiene entrada propia con LM_1730 y MJ_1730 -> reconoce LM_1730', () => {
     const result = parsearHorarios('Lunes y miércoles (17:30 - 19:30)', 'Francés');
     assert.deepEqual(result, ['LM_1730']);
   });
@@ -107,34 +109,57 @@ describe('parsearHorarios', () => {
 });
 
 describe('determinarNivel', () => {
-  test('"con exactitud" -> normalizarNivel(nivelDeclarado) matcheado contra CONFIG.niveles', () => {
+  test('"con exactitud" -> siguienteNivel: next level in sequence for the idioma', () => {
     const result = determinarNivel(
       'Sí, con exactitud y cuento con certificado/curso oficial',
-      'b1.1'
+      'A1.1',
+      'Inglés'
     );
-    assert.equal(result, 'B1.1');
+    assert.equal(result, 'A1.2');
   });
 
   test('"principiante absoluto" -> CONFIG.nivelPrincipiante', () => {
-    const result = determinarNivel('Soy principiante absoluto.', '');
+    const result = determinarNivel('Soy principiante absoluto.', '', 'Inglés');
     assert.equal(result, CONFIG.nivelPrincipiante);
     assert.equal(result, 'A1.1');
   });
 
   test('"he tomado clases" -> CONFIG.nivelPorEvaluar', () => {
-    const result = determinarNivel('No, pero he tomado clases.', '');
+    const result = determinarNivel('No, pero he tomado clases.', '', 'Inglés');
     assert.equal(result, CONFIG.nivelPorEvaluar);
     assert.equal(result, 'Por evaluar (prueba de nivel)');
   });
 
   test('respuesta vacía o undefined -> \'\' (nunca null/undefined)', () => {
-    assert.equal(determinarNivel('', ''), '');
-    assert.equal(determinarNivel(undefined, undefined), '');
+    assert.equal(determinarNivel('', '', 'Inglés'), '');
+    assert.equal(determinarNivel(undefined, undefined, 'Inglés'), '');
   });
 
   test('respuesta que no calza con ninguna rama -> \'\' (fallthrough)', () => {
-    const result = determinarNivel('respuesta que no calza con ninguna rama', '');
+    const result = determinarNivel('respuesta que no calza con ninguna rama', '', 'Inglés');
     assert.equal(result, '');
+  });
+});
+
+describe('siguienteNivel', () => {
+  test('nivel conocido que no es el tope -> devuelve el siguiente nivel en la secuencia _default', () => {
+    const result = siguienteNivel('A1.1', 'Inglés');
+    assert.equal(result, 'A1.2');
+  });
+
+  test('nivel en el tope de la escala (_default: C1.2) -> nivelPorEvaluar', () => {
+    const result = siguienteNivel('C1.2', 'Inglés');
+    assert.equal(result, CONFIG.nivelPorEvaluar);
+  });
+
+  test('nivel no reconocido en el catálogo -> nivelPorEvaluar (se loguea, no se lanza)', () => {
+    const result = siguienteNivel('Z9.9', 'Inglés');
+    assert.equal(result, CONFIG.nivelPorEvaluar);
+  });
+
+  test('Japonés con A1.1 (único nivel disponible, es el tope) -> nivelPorEvaluar', () => {
+    const result = siguienteNivel('A1.1', 'Japonés');
+    assert.equal(result, CONFIG.nivelPorEvaluar);
   });
 });
 
