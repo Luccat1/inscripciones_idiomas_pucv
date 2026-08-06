@@ -19,12 +19,12 @@ const CONFIG = {
   emailAvisos: ['idiomas@pucv.cl'],
 
   // Idiomas ofrecidos
-  idiomas: ['Alemán', 'Francés', 'Inglés', 'Italiano'],
+  idiomas: ['Alemán', 'Francés', 'Inglés', 'Italiano', 'Japonés'],
 
   // Niveles ofrecidos (ajustar si el catálogo real difiere)
   niveles: [
     'A1.1', 'A1.2', 'A2.1', 'A2.2',
-    'B1.1', 'B1.2', 'B2.1', 'B2.2',
+    'B1.1', 'B1.2', 'B1+', 'B2.1', 'B2.2',
     'C1.1', 'C1.2'
   ],
 
@@ -33,20 +33,29 @@ const CONFIG = {
   // literalmente como opción del formulario, para hacer match).
   // El match contra la respuesta real es case-insensitive (ver parsearHorarios
   // en Core.gs), pero el TEXTO (horas, días) debe seguir calzando con las
-  // opciones reales del Form -- verificado contra respuestas reales al
-  // 2026-07. 'Francés' no tiene entrada propia (sin datos reales aún) y cae
-  // en '_default'; revisar cuando lleguen las primeras respuestas.
+  // opciones reales del Form.
+  // Verified against form options for 2do Semestre 2026 (2026-08). All five
+  // active idiomas have explicit entries; '_default' is a fallback for
+  // unexpected or future languages only.
   horariosPorIdioma: {
     'Alemán': [
       { id: 'LM_1730', label: 'Lunes y miércoles (17:30 - 19:30)' },
       { id: 'MJ_1730', label: 'Martes y jueves (17:30 - 19:30)' }
     ],
-    'Italiano': [
-      { id: 'MJ_1730_UNICO', label: 'Martes y jueves (17:30 - 19:30) - Único horario disponible este semestre' }
+    'Francés': [
+      { id: 'LM_1730', label: 'Lunes y miércoles (17:30 - 19:30)' },
+      { id: 'MJ_1730', label: 'Martes y jueves (17:30 - 19:30)' }
     ],
     'Inglés': [
       { id: 'LM_1730', label: 'Lunes y miércoles (17:30 - 19:30)' },
       { id: 'VS_1730', label: 'Viernes (17:30 - 19:30) y sábado (10:00 - 12:00)' }
+    ],
+    'Italiano': [
+      { id: 'MJ_1730', label: 'Martes y jueves (17:30 - 19:30)' },
+      { id: 'VS_1730', label: 'Viernes (17:30 - 19:30) y sábado (10:00 - 12:00)' }
+    ],
+    'Japonés': [
+      { id: 'MJ_1730_UNICO', label: 'Martes y jueves (17:30 - 19:30) - Único horario disponible este semestre' }
     ],
     '_default': [
       { id: 'LM_1730', label: 'Lunes y miércoles (17:30 - 19:30)' },
