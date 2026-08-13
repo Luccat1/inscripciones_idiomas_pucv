@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-07-25)
 Phase: 2
 Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-08-06 - Completed quick task 260806-hxc: Actualizar Config.gs para alinear el catálogo con el formulario real del 2do semestre 2026
+Last activity: 2026-08-13 - Completed quick task 260813-hwv: Corregir CONFIG.nivelesPorIdioma — entrada explícita Alemán con subniveles, _default con niveles enteros
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -78,6 +78,8 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260806-hxc | Actualizar Config.gs para alinear el catálogo con el formulario real del 2do semestre 2026 | 2026-08-06 | ee223ac | [260806-hxc-actualizar-config-gs-para-alinear-el-cat](.planning/quick/260806-hxc-actualizar-config-gs-para-alinear-el-cat/) |
+| 260806-i7t | Sincronizar repo local con versión de Apps Script: agregar CONFIG.nivelesPorIdioma, reemplazar Core.gs, actualizar tests | 2026-08-06 | dfaed35 | [260806-i7t-sincronizar-repo-local-con-versi-n-de-ap](.planning/quick/260806-i7t-sincronizar-repo-local-con-versi-n-de-ap/) |
+| 260813-hwv | Corregir CONFIG.nivelesPorIdioma: entrada explícita Alemán con subniveles, _default con niveles enteros (A1, A2, ...) | 2026-08-13 | 6e01926 | [260813-hwv-corregir-nivelesporidioma-en-config-gs](.planning/quick/260813-hwv-corregir-nivelesporidioma-en-config-gs/) |
 
 ### Blockers/Concerns
 
