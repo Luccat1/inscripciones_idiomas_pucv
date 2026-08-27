@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(gsd:quick)",
+      "Bash(npm test:*)"
+    ]
+  }
+}
