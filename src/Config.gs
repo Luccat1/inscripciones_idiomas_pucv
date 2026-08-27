@@ -21,12 +21,29 @@ const CONFIG = {
   // Idiomas ofrecidos
   idiomas: ['Alemán', 'Francés', 'Inglés', 'Italiano', 'Japonés'],
 
-  // Niveles ofrecidos (ajustar si el catálogo real difiere)
+  // Niveles ofrecidos — informativo únicamente, no usado en runtime.
+  // Lista todos los niveles únicos que aparecen en cualquier secuencia de
+  // nivelesPorIdioma (Alemán + _default + Japonés).
   niveles: [
+    'A1', 'A2',
     'A1.1', 'A1.2', 'A2.1', 'A2.2',
     'B1.1', 'B1.2', 'B1+', 'B2.1', 'B2.2',
     'C1.1', 'C1.2'
   ],
+
+  // Secuencia canónica de niveles por idioma, usada por siguienteNivel() en
+  // Core.gs para calcular el nivel de inscripción de quien ya domina el nivel
+  // declarado. Mismo patrón de catálogo por idioma + fallback '_default' que
+  // horariosPorIdioma.
+  // — Alemán usa subniveles (A1.1, A1.2, ...) porque así opera su programa.
+  // — Inglés, Francés, Italiano, y otros idiomas sin entrada propia usan la
+  //   secuencia de niveles enteros (_default: A1, A2, ...).
+  // — Japonés tiene solo A1.1 (único nivel ofrecido este semestre).
+  nivelesPorIdioma: {
+    'Alemán': ['A1.1', 'A1.2', 'A2.1', 'A2.2', 'B1.1', 'B1.2', 'B1+', 'B2.1', 'B2.2', 'C1.1', 'C1.2'],
+    'Japonés': ['A1.1'],
+    '_default': ['A1', 'A2', 'B1.1', 'B1.2', 'B2.1', 'B2.2', 'C1.1', 'C1.2']
+  },
 
   // Catálogo canónico de horarios por idioma. Cada bloque tiene un id
   // estable (usado como clave interna) y una etiqueta (la que aparece

@@ -25,7 +25,8 @@ function recalcularPanorama() {
     throw new Error('No se encontró la hoja de respuestas "' + CONFIG.hojas.respuestas + '". Ajusta CONFIG.hojas.respuestas en Config.gs.');
   }
 
-  const inscripciones = leerRespuestas(sheetRespuestas);
+  const resultado = leerRespuestas(sheetRespuestas);
+  const inscripciones = resultado.inscripciones;
   const buckets = construirBuckets(inscripciones);
   const personasUnicas = contarPersonasUnicasPorNivel(inscripciones);
 

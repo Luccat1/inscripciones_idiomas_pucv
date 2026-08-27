@@ -5,12 +5,16 @@
  */
 
 /**
- * Lee la hoja de respuestas y devuelve un arreglo de inscripciones normalizadas.
- * Cada inscripción: { nombre, email, idioma, nivel, horarios: [ids], rowIndex }
+ * Lee la hoja de respuestas y devuelve un objeto con:
+ * - inscripciones: arreglo de inscripciones normalizadas.
+ *   Cada inscripción: { nombre, email, idioma, nivel, horarios: [ids], rowIndex }
+ * - horarioNoReconocido: { count, ejemplos } -- horarios descartados por no
+ *   calzar con el catálogo; count es el total de ocurrencias, ejemplos es un
+ *   arreglo de hasta 3 strings distintos para facilitar el diagnóstico.
  */
 function leerRespuestas(sheet) {
   const data = sheet.getDataRange().getValues();
-  if (data.length <= 1) return [];
+  if (data.length <= 1) return { inscripciones: [], horarioNoReconocido: { count: 0, ejemplos: [] } };
 
   const headers = data[0].map(h => h.toString().toUpperCase().trim());
   const cols = mapearColumnas(headers);
@@ -23,6 +27,7 @@ function leerRespuestas(sheet) {
   }
 
   const inscripciones = [];
+  const horarioNoReconocido = { count: 0, ejemplos: [] };
 
   for (let i = 1; i < data.length; i++) {
     const row = data[i];
@@ -37,10 +42,18 @@ function leerRespuestas(sheet) {
 
     const conoceNivelResp = cols.conoceNivel !== -1 ? row[cols.conoceNivel] : '';
     const nivelDeclaradoResp = cols.nivelDeclarado !== -1 ? row[cols.nivelDeclarado] : '';
-    const nivel = determinarNivel(conoceNivelResp, nivelDeclaradoResp);
+    const nivel = determinarNivel(conoceNivelResp, nivelDeclaradoResp, idioma);
 
     const horariosCelda = primeraCeldaNoVacia(row, cols.horarios);
     const horarios = parsearHorarios(horariosCelda, idioma);
+
+    const noReconocidos = encontrarHorarioNoReconocido(horariosCelda, idioma);
+    noReconocidos.forEach(etiqueta => {
+      horarioNoReconocido.count++;
+      if (horarioNoReconocido.ejemplos.indexOf(etiqueta) === -1 && horarioNoReconocido.ejemplos.length < 3) {
+        horarioNoReconocido.ejemplos.push(etiqueta);
+      }
+    });
 
     const modalidadCelda = primeraCeldaNoVacia(row, cols.modalidad);
     const modalidades = parsearModalidad(modalidadCelda);
@@ -58,7 +71,7 @@ function leerRespuestas(sheet) {
     });
   }
 
-  return inscripciones;
+  return { inscripciones, horarioNoReconocido };
 }
 
 /**
@@ -118,17 +131,18 @@ function primeraCeldaNoVacia(row, indices) {
 /**
  * Resuelve el nivel real de la inscripción según la respuesta a "¿Conoces tu
  * nivel actual en el idioma que quieres aprender?":
- * - "Sí, con exactitud..." -> usa el nivel declarado (con certificado/curso).
+ * - "Sí, con exactitud..." -> llama siguienteNivel(nivelDeclarado, idioma)
+ *   para avanzar al siguiente nivel en la secuencia del idioma.
  * - "Soy principiante absoluto." -> CONFIG.nivelPrincipiante (ej. A1.1).
  * - "No, pero he tomado clases." -> CONFIG.nivelPorEvaluar (requiere prueba
  *   de nivel; no se puede asumir un nivel formal sin evaluar).
  */
-function determinarNivel(conoceNivelResp, nivelDeclaradoResp) {
+function determinarNivel(conoceNivelResp, nivelDeclaradoResp, idioma) {
   const respuesta = normalizarTexto(conoceNivelResp);
   if (!respuesta) return '';
 
   if (respuesta.indexOf('con exactitud') !== -1) {
-    return normalizarNivel(nivelDeclaradoResp);
+    return siguienteNivel(nivelDeclaradoResp, idioma);
   }
   if (respuesta.indexOf('principiante absoluto') !== -1) {
     return CONFIG.nivelPrincipiante;
@@ -137,6 +151,24 @@ function determinarNivel(conoceNivelResp, nivelDeclaradoResp) {
     return CONFIG.nivelPorEvaluar;
   }
   return '';
+}
+
+/**
+ * Dado el nivel declarado (ya dominado) y el idioma, devuelve el siguiente
+ * nivel en la secuencia canónica de CONFIG.nivelesPorIdioma para ese idioma
+ * (o '_default' si el idioma no tiene entrada propia). Si el nivel declarado
+ * es el tope de la escala, o si no se reconoce en el catálogo, devuelve
+ * CONFIG.nivelPorEvaluar.
+ */
+function siguienteNivel(nivelDeclaradoResp, idioma) {
+  const secuencia = CONFIG.nivelesPorIdioma[idioma] || CONFIG.nivelesPorIdioma['_default'];
+  const nivelNorm = normalizarNivel(nivelDeclaradoResp, idioma);
+  const idx = secuencia.indexOf(nivelNorm);
+  if (idx === -1 || idx === secuencia.length - 1) {
+    Logger.log('siguienteNivel: nivel "' + nivelDeclaradoResp + '" no tiene siguiente en la secuencia [' + idioma + '] -> nivelPorEvaluar');
+    return CONFIG.nivelPorEvaluar;
+  }
+  return secuencia[idx + 1];
 }
 
 /**
@@ -163,6 +195,22 @@ function parsearHorarios(celda, idioma) {
   });
 
   return ids;
+}
+
+/**
+ * Devuelve las etiquetas de horario de la celda que NO calzan con el
+ * catálogo del idioma. Usado para el tracking de horarioNoReconocido en
+ * leerRespuestas(). Nunca lanza; devuelve arreglo vacío si celda está vacía.
+ */
+function encontrarHorarioNoReconocido(celda, idioma) {
+  if (!celda) return [];
+  const catalogo = CONFIG.horariosPorIdioma[idioma] || CONFIG.horariosPorIdioma['_default'];
+  const opciones = celda.toString().split(',').map(s => s.trim()).filter(Boolean);
+
+  return opciones.filter(opcion => {
+    const opcionNorm = normalizarTexto(opcion);
+    return !catalogo.find(h => normalizarTexto(h.label) === opcionNorm);
+  });
 }
 
 /**
@@ -256,10 +304,16 @@ function normalizarIdioma(valor) {
   return match || texto;
 }
 
-function normalizarNivel(valor) {
+/**
+ * Normaliza un valor de nivel contra la secuencia canónica del idioma
+ * (CONFIG.nivelesPorIdioma[idioma] || CONFIG.nivelesPorIdioma['_default']).
+ * Si no encuentra match, devuelve el texto tal como viene (en mayúsculas).
+ */
+function normalizarNivel(valor, idioma) {
   if (!valor) return '';
   const texto = valor.toString().trim().toUpperCase();
-  const match = CONFIG.niveles.find(n => n.toUpperCase() === texto);
+  const secuencia = CONFIG.nivelesPorIdioma[idioma] || CONFIG.nivelesPorIdioma['_default'];
+  const match = secuencia.find(n => n.toUpperCase() === texto);
   return match || texto;
 }
 
@@ -295,6 +349,9 @@ if (typeof module !== 'undefined' && module.exports) {
     normalizarNivel,
     normalizarIdioma,
     primeraCeldaNoVacia,
-    obtenerLabelHorario
+    obtenerLabelHorario,
+    siguienteNivel,
+    encontrarHorarioNoReconocido,
+    leerRespuestas
   };
 }
