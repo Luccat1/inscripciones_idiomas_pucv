@@ -19,23 +19,30 @@ const CONFIG = {
   emailAvisos: ['idiomas@pucv.cl'],
 
   // Idiomas ofrecidos
-  idiomas: ['Alemán', 'Francés', 'Inglés', 'Italiano'],
+  idiomas: ['Alemán', 'Francés', 'Inglés', 'Italiano', 'Japonés'],
 
-  // Niveles ofrecidos (ajustar si el catálogo real difiere)
+  // Niveles ofrecidos — informativo únicamente, no usado en runtime.
+  // Lista todos los niveles únicos que aparecen en cualquier secuencia de
+  // nivelesPorIdioma (Alemán + _default + Japonés).
   niveles: [
+    'A1', 'A2',
     'A1.1', 'A1.2', 'A2.1', 'A2.2',
-    'B1.1', 'B1.2', 'B2.1', 'B2.2',
+    'B1.1', 'B1.2', 'B1+', 'B2.1', 'B2.2',
     'C1.1', 'C1.2'
   ],
 
   // Secuencia canónica de niveles por idioma, usada por siguienteNivel() en
   // Core.gs para calcular el nivel de inscripción de quien ya domina el nivel
   // declarado. Mismo patrón de catálogo por idioma + fallback '_default' que
-  // horariosPorIdioma. Japonés tiene solo A1.1 (único nivel ofrecido este
-  // semestre); para todos los demás idiomas aplica la secuencia completa.
+  // horariosPorIdioma.
+  // — Alemán usa subniveles (A1.1, A1.2, ...) porque así opera su programa.
+  // — Inglés, Francés, Italiano, y otros idiomas sin entrada propia usan la
+  //   secuencia de niveles enteros (_default: A1, A2, ...).
+  // — Japonés tiene solo A1.1 (único nivel ofrecido este semestre).
   nivelesPorIdioma: {
+    'Alemán': ['A1.1', 'A1.2', 'A2.1', 'A2.2', 'B1.1', 'B1.2', 'B1+', 'B2.1', 'B2.2', 'C1.1', 'C1.2'],
     'Japonés': ['A1.1'],
-    '_default': ['A1.1', 'A1.2', 'A2.1', 'A2.2', 'B1.1', 'B1.2', 'B1+', 'B2.1', 'B2.2', 'C1.1', 'C1.2']
+    '_default': ['A1', 'A2', 'B1.1', 'B1.2', 'B2.1', 'B2.2', 'C1.1', 'C1.2']
   },
 
   // Catálogo canónico de horarios por idioma. Cada bloque tiene un id
@@ -43,20 +50,29 @@ const CONFIG = {
   // literalmente como opción del formulario, para hacer match).
   // El match contra la respuesta real es case-insensitive (ver parsearHorarios
   // en Core.gs), pero el TEXTO (horas, días) debe seguir calzando con las
-  // opciones reales del Form -- verificado contra respuestas reales al
-  // 2026-07. 'Francés' no tiene entrada propia (sin datos reales aún) y cae
-  // en '_default'; revisar cuando lleguen las primeras respuestas.
+  // opciones reales del Form.
+  // Verified against form options for 2do Semestre 2026 (2026-08). All five
+  // active idiomas have explicit entries; '_default' is a fallback for
+  // unexpected or future languages only.
   horariosPorIdioma: {
     'Alemán': [
       { id: 'LM_1730', label: 'Lunes y miércoles (17:30 - 19:30)' },
       { id: 'MJ_1730', label: 'Martes y jueves (17:30 - 19:30)' }
     ],
-    'Italiano': [
-      { id: 'MJ_1730_UNICO', label: 'Martes y jueves (17:30 - 19:30) - Único horario disponible este semestre' }
+    'Francés': [
+      { id: 'LM_1730', label: 'Lunes y miércoles (17:30 - 19:30)' },
+      { id: 'MJ_1730', label: 'Martes y jueves (17:30 - 19:30)' }
     ],
     'Inglés': [
       { id: 'LM_1730', label: 'Lunes y miércoles (17:30 - 19:30)' },
       { id: 'VS_1730', label: 'Viernes (17:30 - 19:30) y sábado (10:00 - 12:00)' }
+    ],
+    'Italiano': [
+      { id: 'MJ_1730', label: 'Martes y jueves (17:30 - 19:30)' },
+      { id: 'VS_1730', label: 'Viernes (17:30 - 19:30) y sábado (10:00 - 12:00)' }
+    ],
+    'Japonés': [
+      { id: 'MJ_1730_UNICO', label: 'Martes y jueves (17:30 - 19:30) - Único horario disponible este semestre' }
     ],
     '_default': [
       { id: 'LM_1730', label: 'Lunes y miércoles (17:30 - 19:30)' },

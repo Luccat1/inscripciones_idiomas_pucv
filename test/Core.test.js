@@ -112,10 +112,10 @@ describe('determinarNivel', () => {
   test('"con exactitud" -> siguienteNivel: next level in sequence for the idioma', () => {
     const result = determinarNivel(
       'Sí, con exactitud y cuento con certificado/curso oficial',
-      'A1.1',
+      'A1',
       'Inglés'
     );
-    assert.equal(result, 'A1.2');
+    assert.equal(result, 'A2');
   });
 
   test('"principiante absoluto" -> CONFIG.nivelPrincipiante', () => {
@@ -143,8 +143,8 @@ describe('determinarNivel', () => {
 
 describe('siguienteNivel', () => {
   test('nivel conocido que no es el tope -> devuelve el siguiente nivel en la secuencia _default', () => {
-    const result = siguienteNivel('A1.1', 'Inglés');
-    assert.equal(result, 'A1.2');
+    const result = siguienteNivel('A1', 'Inglés');
+    assert.equal(result, 'A2');
   });
 
   test('nivel en el tope de la escala (_default: C1.2) -> nivelPorEvaluar', () => {
@@ -159,6 +159,16 @@ describe('siguienteNivel', () => {
 
   test('Japonés con A1.1 (único nivel disponible, es el tope) -> nivelPorEvaluar', () => {
     const result = siguienteNivel('A1.1', 'Japonés');
+    assert.equal(result, CONFIG.nivelPorEvaluar);
+  });
+
+  test('Alemán A1.1 -> A1.2 (usa secuencia propia, no _default)', () => {
+    const result = siguienteNivel('A1.1', 'Alemán');
+    assert.equal(result, 'A1.2');
+  });
+
+  test('Inglés A1.1 no reconocido en _default -> nivelPorEvaluar', () => {
+    const result = siguienteNivel('A1.1', 'Inglés');
     assert.equal(result, CONFIG.nivelPorEvaluar);
   });
 });

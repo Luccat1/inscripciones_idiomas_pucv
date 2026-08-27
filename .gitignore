@@ -10,3 +10,4 @@ desktop.ini
 
 # clasp
 .clasp.json
+.claude/worktrees/
